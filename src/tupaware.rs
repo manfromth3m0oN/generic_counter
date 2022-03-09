@@ -1,12 +1,12 @@
 use crate::counter::Countable;
 
 #[derive(Clone)]
-pub struct Tupaware<T> {
+pub struct Tupaware<T: Countable + ?Sized> {
     pub colour: String,
-    contents: Vec<T>,
+    contents: Vec<Box<T>>,
 }
 
-impl<T> Tupaware<T> {
+impl<T: Countable> Tupaware<T> {
     pub fn new(colour: &str) -> Tupaware<T> {
         return Tupaware {
             colour: String::from(colour),
@@ -15,12 +15,16 @@ impl<T> Tupaware<T> {
     }
 
     pub fn add_item(&mut self, item: T) {
-        self.contents.push(item);
+        self.contents.push(Box::new(item));
     }
 }
 
-impl<T> Countable for Tupaware<T> {
+impl<T: Countable + ?Sized> Countable for Tupaware<T> {
     fn get_count(&self) -> usize {
-        self.contents.len()
+        let total: usize = 0;
+        for item in &self.contents {
+            total += item.get_count();
+        }
+        total
     }
 }
